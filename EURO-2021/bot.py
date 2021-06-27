@@ -220,7 +220,7 @@ def send_matches(message):
 
             for game in match:
                 for m in game['teams']:
-                    if (m == country) and (game['date'] > date.strftime('%Y-%m-%d')):
+                    if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
                         if len(game['teams']) == 2:
                             bot.send_message(message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
 
