@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 URL = 'https://www.sports.ru/uefa-euro/calendar/'
 
 total_info = []
+all_countries = ['Португалия', "Бельгия", "Франция", "Германия", "Дания", "Уэльс", "Италия", "Австрия", "Нидерланды", "Чехия", "Хорватия", "Испания", "Швейцария", "Англия", "Швеция", "Украина"]
 date = datetime.datetime.today()
 
 def num_word(value, words):
@@ -68,7 +69,7 @@ def parse():
 
     return total_info
 
-bot = telebot.TeleBot("1822822709:AAEG9BlP6pvHWeaa1jcEE0QaM5xFwlfIikM")
+bot = telebot.TeleBot("1822822709:AAEG9BlP6pvHWeaa1jcEE0QaM5xFwlfIikM") # 1822822709:AAEG9BlP6pvHWeaa1jcEE0QaM5xFwlfIikM, 1808668238:AAEFTKkXNnXvgLZ2bXD1NgbLEf8CAbzaFd8
 
 @bot.message_handler(commands=['start'])
 
@@ -198,22 +199,22 @@ def send_matches(message):
     elif message.text == 'С кем будет играть...':
         markup = types.ReplyKeyboardMarkup(row_width = 2)
 
-        itembtn1 = types.KeyboardButton('Португалия')
-        itembtn2 = types.KeyboardButton('Франция')
-        itembtn3 = types.KeyboardButton('Германия')
-        itembtn4 = types.KeyboardButton('Бельгия')
-        itembtn5 = types.KeyboardButton('Уэльс')
-        itembtn6 = types.KeyboardButton('Дания')
-        itembtn7 = types.KeyboardButton('Италия')
-        itembtn8 = types.KeyboardButton('Австрия')
-        itembtn9 = types.KeyboardButton('Нидерланды')
-        itembtn10 = types.KeyboardButton('Чехия')
-        itembtn11 = types.KeyboardButton('Хорватия')
-        itembtn12 = types.KeyboardButton('Испания')
-        itembtn13 = types.KeyboardButton('Швейцария')
-        itembtn14 = types.KeyboardButton('Англия')
-        itembtn15 = types.KeyboardButton('Швеция')
-        itembtn16 = types.KeyboardButton('Украина')
+        itembtn1 = types.KeyboardButton('Португалия 🇵🇹')
+        itembtn2 = types.KeyboardButton('Франция 🇫🇷')
+        itembtn3 = types.KeyboardButton('Германия 🇩🇪')
+        itembtn4 = types.KeyboardButton('Бельгия 🇧🇪')
+        itembtn5 = types.KeyboardButton('Уэльс 🏴󠁧󠁢󠁷󠁬󠁳󠁿')
+        itembtn6 = types.KeyboardButton('Дания 🇩🇰')
+        itembtn7 = types.KeyboardButton('Италия 🇮🇹')
+        itembtn8 = types.KeyboardButton('Австрия 🇦🇹')
+        itembtn9 = types.KeyboardButton('Нидерланды 🇳🇱')
+        itembtn10 = types.KeyboardButton('Чехия 🇨🇿')
+        itembtn11 = types.KeyboardButton('Хорватия 🇭🇷')
+        itembtn12 = types.KeyboardButton('Испания 🇪🇸')
+        itembtn13 = types.KeyboardButton('Швейцария 🇨🇭')
+        itembtn14 = types.KeyboardButton('Англия 🏴󠁧󠁢󠁥󠁮󠁧󠁿')
+        itembtn15 = types.KeyboardButton('Швеция 🇸🇪')
+        itembtn16 = types.KeyboardButton('Украина 🇺🇦')
 
         markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
         bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
@@ -238,24 +239,24 @@ def send_matches(message):
 
     #     markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
     #     bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
-        
+
     else:
         array = message.text.split(' ')
 
-        if len(array) > 0:
-            country = array[0]
-            match = parse()
-            temporary_name = False
+        for country in all_countries:
+            if array[0] == country:
+                match = parse()
+                temporary_name = False
 
-            for game in match:
-                for m in game['teams']:
-                    if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
-                        if len(game['teams']) == 2:
-                            bot.send_message(message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                for game in match:
+                    for m in game['teams']:
+                        if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                            if len(game['teams']) == 2:
+                                bot.send_message(message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
 
-                        temporary_name = True
+                            temporary_name = True
 
-            if temporary_name == False:
-                bot.send_message(message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                if temporary_name == False:
+                    bot.send_message(message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
 
 bot.polling(none_stop = True)
