@@ -11,7 +11,28 @@ URL = 'https://www.sports.ru/uefa-euro/calendar/'
 
 total_info = []
 all_countries = ['Португалия', "Бельгия", "Франция", "Германия", "Дания", "Уэльс", "Италия", "Австрия", "Нидерланды", "Чехия", "Хорватия", "Испания", "Швейцария", "Англия", "Швеция", "Украина"]
+
+declension_of_words = {
+    "Португалия": "Португалией",
+    "Бельгия": "Бельгией",
+    "Франция": "Францией",
+    "Германия": "Германией",
+    "Дания": "Португалией",
+    "Уэльс": "Уэльсом",
+    "Италия": "Италией",
+    "Австрия": "Австрией",
+    "Нидерланды": "Нидерландами",
+    "Чехия": "Чехией",
+    "Хорватия": "Хорватией",
+    "Испания": "Испанией",
+    "Швейцария": "Швейцарией",
+    "Англия": "Англией",
+    "Швеция": "Швецией",
+    "Украина": "Украиной",    
+}
+
 date = datetime.datetime.today()
+print(datetime.datetime.today() + timedelta(days = 0), datetime.datetime.today() + timedelta(days = 1))
 
 def num_word(value, words):
     value = value % 100
@@ -128,12 +149,18 @@ def send_matches(message):
                 bot.send_message(message.chat.id, to_send_message)
 
                 for game in array_of_dates:
-                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(game['teams'][0], game['teams'][1], game['time'])
+                    first_country = declension_of_words[game['teams'][0]]
+                    second_country = declension_of_words[game['teams'][1]]
+
+                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, game['time'])
                     bot.send_message(message.chat.id, g)
 
             if len(array_of_dates) == 1:
                 to_send_message = '''Сегодня будет матч'''
-                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(array_of_dates[0]['teams'][0], array_of_dates[0]['teams'][1], array_of_dates[0]['time'])
+                first_country = declension_of_words[array_of_dates['teams'][0]]
+                second_country = declension_of_words[array_of_dates['teams'][1]]
+
+                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
                 bot.send_message(message.chat.id, to_send_message)
                 bot.send_message(message.chat.id, game)
 
@@ -155,18 +182,24 @@ def send_matches(message):
                 bot.send_message(message.chat.id, to_send_message)
 
                 for game in array_of_dates:
-                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(game['teams'][0], game['teams'][1], game['time'])
+                    first_country = declension_of_words[game['teams'][0]]
+                    second_country = declension_of_words[game['teams'][1]]
+                    
+                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, game['time'])
                     bot.send_message(message.chat.id, g)
 
             if len(array_of_dates) == 1:
                 to_send_message = '''Завтра будет матч'''
-                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(array_of_dates[0]['teams'][0], array_of_dates[0]['teams'][1], array_of_dates[0]['time'])
+                first_country = declension_of_words[array_of_dates['teams'][0]]
+                second_country = declension_of_words[array_of_dates['teams'][1]]
+
+                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
                 bot.send_message(message.chat.id, to_send_message)
                 bot.send_message(message.chat.id, game)
 
     elif message.text == 'Ближайшие матчи':
         match = parse()
-        i = 0
+        i = -1
 
         while len(array_of_dates) == 0:
             for m in match:
@@ -183,16 +216,31 @@ def send_matches(message):
 
         if len(array_of_dates) > 0:
             if len(array_of_dates) > 1:
-                to_send_message = '''Через {} {} будет несколько матчей'''.format(i, word)
-                bot.send_message(message.chat.id, to_send_message)
+                if i == 0:
+                    to_send_message = '''Сегодня будет несколько матчей'''
+                    bot.send_message(message.chat.id, to_send_message)
+
+                if i == 1:
+                    to_send_message = '''Завтра будет несколько матчей'''
+                    bot.send_message(message.chat.id, to_send_message)
+
+                if i >= 2:
+                    to_send_message = '''Через {} {} будет несколько матчей'''.format(i, word)
+                    bot.send_message(message.chat.id, to_send_message)
 
                 for game in array_of_dates:
-                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(game['teams'][0], game['teams'][1], game['time'])
+                    first_country = declension_of_words[game['teams'][0]]
+                    second_country = declension_of_words[game['teams'][1]]
+                    
+                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, game['time'])
                     bot.send_message(message.chat.id, g)
 
             if len(array_of_dates) == 1:
                 to_send_message = '''Через {} {} будет матч'''.format(i, word)
-                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(array_of_dates[0]['teams'][0], array_of_dates[0]['teams'][1], array_of_dates[0]['time'])
+                first_country = declension_of_words[array_of_dates['teams'][0]]
+                second_country = declension_of_words[array_of_dates['teams'][1]]
+
+                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
                 bot.send_message(message.chat.id, to_send_message)
                 bot.send_message(message.chat.id, game)
 
