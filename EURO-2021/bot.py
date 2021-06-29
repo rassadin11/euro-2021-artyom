@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 URL = 'https://www.sports.ru/uefa-euro/calendar/'
 
 total_info = []
+date = datetime.datetime.today()
 
 def num_word(value, words):
     value = value % 100
@@ -48,8 +49,8 @@ def parse():
             name_team.append(team.get_text(strip = True))
 
         score = item.find('div', class_ = 'match-teaser__team-score').get_text(strip = True).replace('–', ' ')
-        date = item.find('div', class_ = 'match-teaser__info').get_text(strip = True).replace('Чемпионат Европы. ', '').replace(' Не начался', '')
-        data_array = date.split(' ');
+        match_date = item.find('div', class_ = 'match-teaser__info').get_text(strip = True).replace('Чемпионат Европы. ', '').replace(' Не начался', '')
+        data_array = match_date.split(' ');
 
         real_date = data_array[0][0:-1].split(".")
         real_date = list(reversed(real_date))
@@ -105,10 +106,18 @@ def send_matches(message):
 
     if message.text == 'Матчи на сегодня':
         match = parse()
+        print(match)
 
         for m in match:
-            if m['date'] == datetime.datetime.today().strftime('%Y-%m-%d'):
+            print(m['time'], date.strftime('%H:%M:%S'))
+            if (m['date'] == date.strftime('%Y-%m-%d')) and (m['time'] > date.strftime('%H:%M:%S')):
                 array_of_dates.append(m)
+
+            if (m['date'] == date.strftime('%Y-%m-%d')) and (m['time'] <= date.strftime('%H:%M:%S')):
+                future_date = date + timedelta(hours = 2)
+
+                if m['time'] < future_date.strftime('%H:%M:%S'):
+                    bot.send_message(message.chat.id, 'Сейчас идет матч между {} и {}. Счёт в матче на данный момент: {}:{}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1]))
 
         if len(array_of_dates) == 0:
             bot.send_message(message.chat.id, 'Сегодня нет ни одного матча')
@@ -131,7 +140,7 @@ def send_matches(message):
         match = parse()
 
         for m in match:
-            dtt = datetime.datetime.today()
+            dtt = date
             dtt = dtt + timedelta(days = 1)
 
             if m['date'] == dtt.strftime('%Y-%m-%d'):
@@ -156,11 +165,11 @@ def send_matches(message):
 
     elif message.text == 'Ближайшие матчи':
         match = parse()
-        i = 2
+        i = 0
 
         while len(array_of_dates) == 0:
             for m in match:
-                dtt = datetime.datetime.today()
+                dtt = date
                 dtt = dtt + timedelta(days = i)
                 
                 if m['date'] == dtt.strftime('%Y-%m-%d'):
@@ -209,13 +218,33 @@ def send_matches(message):
         markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
         bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
 
+    # elif message.text == 'С каким счетом сыграла...':
+    #     itembtn1 = types.KeyboardButton('Португалия')
+    #     itembtn2 = types.KeyboardButton('Франция')
+    #     itembtn3 = types.KeyboardButton('Германия')
+    #     itembtn4 = types.KeyboardButton('Бельгия')
+    #     itembtn5 = types.KeyboardButton('Уэльс')
+    #     itembtn6 = types.KeyboardButton('Дания')
+    #     itembtn7 = types.KeyboardButton('Италия')
+    #     itembtn8 = types.KeyboardButton('Австрия')
+    #     itembtn9 = types.KeyboardButton('Нидерланды')
+    #     itembtn10 = types.KeyboardButton('Чехия')
+    #     itembtn11 = types.KeyboardButton('Хорватия')
+    #     itembtn12 = types.KeyboardButton('Испания')
+    #     itembtn13 = types.KeyboardButton('Швейцария')
+    #     itembtn14 = types.KeyboardButton('Англия')
+    #     itembtn15 = types.KeyboardButton('Швеция')
+    #     itembtn16 = types.KeyboardButton('Украина')
+
+    #     markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
+    #     bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
+        
     else:
         array = message.text.split(' ')
 
         if len(array) > 0:
             country = array[0]
             match = parse()
-            date = datetime.datetime.today()
             temporary_name = False
 
             for game in match:
@@ -223,9 +252,6 @@ def send_matches(message):
                     if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
                         if len(game['teams']) == 2:
                             bot.send_message(message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
-
-                        if len(game['teams']) == 1:
-                            bot.send_message(message.chat.id, 'Еще не известно с кем будет играть {}'.format(game['teams'][0]))
 
                         temporary_name = True
 
