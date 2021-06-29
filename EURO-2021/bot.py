@@ -32,7 +32,6 @@ declension_of_words = {
 }
 
 date = datetime.datetime.today()
-print(datetime.datetime.today() + timedelta(days = 0), datetime.datetime.today() + timedelta(days = 1))
 
 def num_word(value, words):
     value = value % 100
@@ -128,18 +127,10 @@ def send_matches(message):
 
     if message.text == 'Матчи на сегодня':
         match = parse()
-        print(match)
-
+        
         for m in match:
-            print(m['time'], date.strftime('%H:%M:%S'))
-            if (m['date'] == date.strftime('%Y-%m-%d')) and (m['time'] > date.strftime('%H:%M:%S')):
+            if (m['date'] == date.strftime('%Y-%m-%d')): # and (m['time'] > date.strftime('%H:%M:%S'))
                 array_of_dates.append(m)
-
-            if (m['date'] == date.strftime('%Y-%m-%d')) and (m['time'] <= date.strftime('%H:%M:%S')):
-                future_date = date + timedelta(hours = 2)
-
-                if m['time'] < future_date.strftime('%H:%M:%S'):
-                    bot.send_message(message.chat.id, 'Сейчас идет матч между {} и {}. Счёт в матче на данный момент: {}:{}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1]))
 
         if len(array_of_dates) == 0:
             bot.send_message(message.chat.id, 'Сегодня нет ни одного матча')
@@ -157,8 +148,8 @@ def send_matches(message):
 
             if len(array_of_dates) == 1:
                 to_send_message = '''Сегодня будет матч'''
-                first_country = declension_of_words[array_of_dates['teams'][0]]
-                second_country = declension_of_words[array_of_dates['teams'][1]]
+                first_country = declension_of_words['{}'.format(array_of_dates[0]['teams'][0])]
+                second_country = declension_of_words['{}'.format(array_of_dates[0]['teams'][1])]
 
                 game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
                 bot.send_message(message.chat.id, to_send_message)
@@ -190,8 +181,8 @@ def send_matches(message):
 
             if len(array_of_dates) == 1:
                 to_send_message = '''Завтра будет матч'''
-                first_country = declension_of_words[array_of_dates['teams'][0]]
-                second_country = declension_of_words[array_of_dates['teams'][1]]
+                first_country = declension_of_words[array_of_dates[0]['teams'][0]]
+                second_country = declension_of_words[array_of_dates[0]['teams'][1]]
 
                 game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
                 bot.send_message(message.chat.id, to_send_message)
@@ -199,73 +190,78 @@ def send_matches(message):
 
     elif message.text == 'Ближайшие матчи':
         match = parse()
-        i = -1
+        i = 0
 
         while len(array_of_dates) == 0:
+            temporary_value = False
+
             for m in match:
                 dtt = date
                 dtt = dtt + timedelta(days = i)
-                
+                print(m['date'], dtt.strftime('%Y-%m-%d'))
                 if m['date'] == dtt.strftime('%Y-%m-%d'):
                     array_of_dates.append(m)
+                    temporary_value = True
 
-            i += 1
+            if temporary_value == False:
+                i += 1
+            else:
+                break
 
         match = []
         word = num_word(i, ['день', 'дня', 'дней'])
 
         if len(array_of_dates) > 0:
-            if len(array_of_dates) > 1:
-                if i == 0:
-                    to_send_message = '''Сегодня будет несколько матчей'''
-                    bot.send_message(message.chat.id, to_send_message)
+           if i == 0:
+               to_send_message = '''Сегодня будет несколько матчей'''
+               bot.send_message(message.chat.id, to_send_message)
 
-                if i == 1:
-                    to_send_message = '''Завтра будет несколько матчей'''
-                    bot.send_message(message.chat.id, to_send_message)
+           if i == 1:
+               to_send_message = '''Завтра будет несколько матчей'''
+               bot.send_message(message.chat.id, to_send_message)
 
-                if i >= 2:
-                    to_send_message = '''Через {} {} будет несколько матчей'''.format(i, word)
-                    bot.send_message(message.chat.id, to_send_message)
+           if i >= 2:
+               to_send_message = '''Через {} {} будет несколько матчей'''.format(i, word)
+               bot.send_message(message.chat.id, to_send_message)
 
-                for game in array_of_dates:
-                    first_country = declension_of_words[game['teams'][0]]
-                    second_country = declension_of_words[game['teams'][1]]
-                    
-                    g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, game['time'])
-                    bot.send_message(message.chat.id, g)
+           for game in array_of_dates:
+               first_country = declension_of_words[game['teams'][0]]
+               second_country = declension_of_words[game['teams'][1]]
+               
+               g = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, game['time'])
+               bot.send_message(message.chat.id, g)
 
-            if len(array_of_dates) == 1:
-                to_send_message = '''Через {} {} будет матч'''.format(i, word)
-                first_country = declension_of_words[array_of_dates['teams'][0]]
-                second_country = declension_of_words[array_of_dates['teams'][1]]
+        if len(array_of_dates) == 1:
+            to_send_message = '''Через {} {} будет матч'''.format(i, word)
+            first_country = declension_of_words[array_of_dates[0]['teams'][0]]
+            second_country = declension_of_words[array_of_dates[0]['teams'][1]]
 
-                game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
-                bot.send_message(message.chat.id, to_send_message)
-                bot.send_message(message.chat.id, game)
+            game = '''Игра будет между {} и {}. Игра начнется в {}'''.format(first_country, second_country, array_of_dates[0]['time'])
+            bot.send_message(message.chat.id, to_send_message)
+            bot.send_message(message.chat.id, game)
 
     elif message.text == 'С кем будет играть...':
-        markup = types.ReplyKeyboardMarkup(row_width = 2)
+        markup_inline = types.InlineKeyboardMarkup(row_width = 2)
 
-        itembtn1 = types.KeyboardButton('Португалия 🇵🇹')
-        itembtn2 = types.KeyboardButton('Франция 🇫🇷')
-        itembtn3 = types.KeyboardButton('Германия 🇩🇪')
-        itembtn4 = types.KeyboardButton('Бельгия 🇧🇪')
-        itembtn5 = types.KeyboardButton('Уэльс 🏴󠁧󠁢󠁷󠁬󠁳󠁿')
-        itembtn6 = types.KeyboardButton('Дания 🇩🇰')
-        itembtn7 = types.KeyboardButton('Италия 🇮🇹')
-        itembtn8 = types.KeyboardButton('Австрия 🇦🇹')
-        itembtn9 = types.KeyboardButton('Нидерланды 🇳🇱')
-        itembtn10 = types.KeyboardButton('Чехия 🇨🇿')
-        itembtn11 = types.KeyboardButton('Хорватия 🇭🇷')
-        itembtn12 = types.KeyboardButton('Испания 🇪🇸')
-        itembtn13 = types.KeyboardButton('Швейцария 🇨🇭')
-        itembtn14 = types.KeyboardButton('Англия 🏴󠁧󠁢󠁥󠁮󠁧󠁿')
-        itembtn15 = types.KeyboardButton('Швеция 🇸🇪')
-        itembtn16 = types.KeyboardButton('Украина 🇺🇦')
+        itembtn1 = types.InlineKeyboardButton('Португалия 🇵🇹', callback_data = 'Португалия')
+        itembtn2 = types.InlineKeyboardButton('Франция 🇫🇷', callback_data = 'Франция')
+        itembtn3 = types.InlineKeyboardButton('Германия 🇩🇪', callback_data = 'Германия')
+        itembtn4 = types.InlineKeyboardButton('Бельгия 🇧🇪', callback_data = 'Бельгия')
+        itembtn5 = types.InlineKeyboardButton('Уэльс 🏴󠁧󠁢󠁷󠁬󠁳󠁿', callback_data = 'Уэльс')
+        itembtn6 = types.InlineKeyboardButton('Дания 🇩🇰', callback_data = 'Дания')
+        itembtn7 = types.InlineKeyboardButton('Италия 🇮🇹', callback_data = 'Италия')
+        itembtn8 = types.InlineKeyboardButton('Австрия 🇦🇹', callback_data = 'Австрия')
+        itembtn9 = types.InlineKeyboardButton('Нидерланды 🇳🇱', callback_data = 'Нидерланды')
+        itembtn10 = types.InlineKeyboardButton('Чехия 🇨🇿', callback_data = 'Чехия')
+        itembtn11 = types.InlineKeyboardButton('Хорватия 🇭🇷', callback_data = 'Хорватия')
+        itembtn12 = types.InlineKeyboardButton('Испания 🇪🇸', callback_data = 'Испания')
+        itembtn13 = types.InlineKeyboardButton('Швейцария 🇨🇭', callback_data = 'Швейцария')
+        itembtn14 = types.InlineKeyboardButton('Англия 🏴󠁧󠁢󠁥󠁮󠁧󠁿', callback_data = 'Англия')
+        itembtn15 = types.InlineKeyboardButton('Швеция 🇸🇪', callback_data = 'Швеция')
+        itembtn16 = types.InlineKeyboardButton('Украина 🇺🇦', callback_data = 'Украина')
 
-        markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
-        bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
+        markup_inline.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
+        bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup_inline)
 
     # elif message.text == 'С каким счетом сыграла...':
     #     itembtn1 = types.KeyboardButton('Португалия')
@@ -288,23 +284,312 @@ def send_matches(message):
     #     markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
     #     bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
 
-    else:
-        array = message.text.split(' ')
+@bot.callback_query_handler(func=lambda call:True)
 
-        for country in all_countries:
-            if array[0] == country:
-                match = parse()
-                temporary_name = False
+def callback(call):
+    if call.message:
+        if call.data == 'Португалия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
 
-                for game in match:
-                    for m in game['teams']:
-                        if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
-                            if len(game['teams']) == 2:
-                                bot.send_message(message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
 
-                            temporary_name = True
+                                    temporary_name = True
 
-                if temporary_name == False:
-                    bot.send_message(message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021'.format(country))
+                        return
+
+        if call.data == 'Франция':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Германия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Бельгия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Уэльс':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Дания':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return  
+
+        if call.data == 'Италия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Австрия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Нидерланды':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Чехия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Хорватия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Испания':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Швейцария':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Англия':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Швеция':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
+
+        if call.data == 'Украина':
+            for country in all_countries:
+                if call.data == country:
+                    match = parse()
+                    temporary_name = False
+
+                    for game in match:
+                        for m in game['teams']:
+                            if (m == country) and (game['date'] >= date.strftime('%Y-%m-%d')):
+                                if len(game['teams']) == 2:
+                                    bot.send_message(call.message.chat.id, '{} - {}'.format(game['teams'][0], game['teams'][1]))
+                                    return
+
+                                    temporary_name = True
+
+                    if temporary_name == False:
+                        bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
+                        return
 
 bot.polling(none_stop = True)
