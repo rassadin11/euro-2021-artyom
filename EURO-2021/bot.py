@@ -100,22 +100,9 @@ def send_echo(message):
     itembtn2 = types.KeyboardButton('Матчи на завтра')
     itembtn3 = types.KeyboardButton('Ближайшие матчи')
     itembtn4 = types.KeyboardButton('С кем будет играть...')
+    itembtn5 = types.KeyboardButton("С каким счетом сыграла...")
 
-    markup.add(itembtn1, itembtn2, itembtn3, itembtn4)
-
-    bot.send_message(message.chat.id, "Что хотите узнать?", reply_markup = markup)
-
-@bot.message_handler(commands=['comeback'])
-
-def comeback_to_choise(message):
-    markup = types.ReplyKeyboardMarkup(row_width = 2)
-
-    itembtn1 = types.KeyboardButton('Матчи на сегодня')
-    itembtn2 = types.KeyboardButton('Матчи на завтра')
-    itembtn3 = types.KeyboardButton('Ближайшие матчи')
-    itembtn4 = types.KeyboardButton('С кем будет играть...')
-
-    markup.add(itembtn1, itembtn2, itembtn3, itembtn4)
+    markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5)
 
     bot.send_message(message.chat.id, "Что хотите узнать?", reply_markup = markup)
     
@@ -127,10 +114,14 @@ def send_matches(message):
 
     if message.text == 'Матчи на сегодня':
         match = parse()
+
+        dt = '{}:{}:{}'.format(date.hour, date.minute, date.second)
+        dt_year = '{}-{}-{}'.format(date.year, date.month, date.day)
         
         for m in match:
-            if (m['date'] == date.strftime('%Y-%m-%d')): # and (m['time'] > date.strftime('%H:%M:%S'))
+            if (m['date'] == date.strftime('%Y-%m-%d')) and (date.strptime(m['time'], '%H:%M:%S') > date.strptime(dt, '%H:%M:%S')):
                 array_of_dates.append(m)
+                continue
 
         if len(array_of_dates) == 0:
             bot.send_message(message.chat.id, 'Сегодня нет ни одного матча')
@@ -198,7 +189,6 @@ def send_matches(message):
             for m in match:
                 dtt = date
                 dtt = dtt + timedelta(days = i)
-                print(m['date'], dtt.strftime('%Y-%m-%d'))
                 if m['date'] == dtt.strftime('%Y-%m-%d'):
                     array_of_dates.append(m)
                     temporary_value = True
@@ -261,28 +251,30 @@ def send_matches(message):
         itembtn16 = types.InlineKeyboardButton('Украина 🇺🇦', callback_data = 'Украина')
 
         markup_inline.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
-        bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup_inline)
+        bot.send_message(message.chat.id, "Выбери команду", reply_markup = markup_inline)
 
-    # elif message.text == 'С каким счетом сыграла...':
-    #     itembtn1 = types.KeyboardButton('Португалия')
-    #     itembtn2 = types.KeyboardButton('Франция')
-    #     itembtn3 = types.KeyboardButton('Германия')
-    #     itembtn4 = types.KeyboardButton('Бельгия')
-    #     itembtn5 = types.KeyboardButton('Уэльс')
-    #     itembtn6 = types.KeyboardButton('Дания')
-    #     itembtn7 = types.KeyboardButton('Италия')
-    #     itembtn8 = types.KeyboardButton('Австрия')
-    #     itembtn9 = types.KeyboardButton('Нидерланды')
-    #     itembtn10 = types.KeyboardButton('Чехия')
-    #     itembtn11 = types.KeyboardButton('Хорватия')
-    #     itembtn12 = types.KeyboardButton('Испания')
-    #     itembtn13 = types.KeyboardButton('Швейцария')
-    #     itembtn14 = types.KeyboardButton('Англия')
-    #     itembtn15 = types.KeyboardButton('Швеция')
-    #     itembtn16 = types.KeyboardButton('Украина')
+    elif message.text == 'С каким счетом сыграла...':
+        markup = types.InlineKeyboardMarkup(row_width = 2)
 
-    #     markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
-    #     bot.send_message(message.chat.id, "Выбери команду. Для того, чтобы вернуться обратно напиши: /comeback", reply_markup = markup)
+        itembtn1 = types.InlineKeyboardButton('Португалия 🇵🇹', callback_data = 'Португалия_1')
+        itembtn2 = types.InlineKeyboardButton('Франция 🇫🇷', callback_data = 'Франция_1')
+        itembtn3 = types.InlineKeyboardButton('Германия 🇩🇪', callback_data = 'Германия_1')
+        itembtn4 = types.InlineKeyboardButton('Бельгия 🇧🇪', callback_data = 'Бельгия_1')
+        itembtn5 = types.InlineKeyboardButton('Уэльс 🏴󠁧󠁢󠁷󠁬󠁳󠁿', callback_data = 'Уэльс_1')
+        itembtn6 = types.InlineKeyboardButton('Дания 🇩🇰', callback_data = 'Дания_1')
+        itembtn7 = types.InlineKeyboardButton('Италия 🇮🇹', callback_data = 'Италия_1')
+        itembtn8 = types.InlineKeyboardButton('Австрия 🇦🇹', callback_data = 'Австрия_1')
+        itembtn9 = types.InlineKeyboardButton('Нидерланды 🇳🇱', callback_data = 'Нидерланды_1')
+        itembtn10 = types.InlineKeyboardButton('Чехия 🇨🇿', callback_data = 'Чехия_1')
+        itembtn11 = types.InlineKeyboardButton('Хорватия 🇭🇷', callback_data = 'Хорватия_1')
+        itembtn12 = types.InlineKeyboardButton('Испания 🇪🇸', callback_data = 'Испания_1')
+        itembtn13 = types.InlineKeyboardButton('Швейцария 🇨🇭', callback_data = 'Швейцария_1')
+        itembtn14 = types.InlineKeyboardButton('Англия 🏴󠁧󠁢󠁥󠁮󠁧󠁿', callback_data = 'Англия_1')
+        itembtn15 = types.InlineKeyboardButton('Швеция 🇸🇪', callback_data = 'Швеция_1')
+        itembtn16 = types.InlineKeyboardButton('Украина 🇺🇦', callback_data = 'Украина_1')
+
+        markup.add(itembtn1, itembtn2, itembtn3, itembtn4, itembtn5, itembtn6, itembtn7, itembtn8, itembtn9, itembtn10, itembtn11, itembtn12, itembtn13, itembtn14, itembtn15, itembtn16)
+        bot.send_message(message.chat.id, "Выбери команду. Выведится сообщение с последним сыгранным матчем этой команды на EURO-2021", reply_markup = markup)
 
 @bot.callback_query_handler(func=lambda call:True)
 
@@ -591,5 +583,693 @@ def callback(call):
                     if temporary_name == False:
                         bot.send_message(call.message.chat.id, '{} уже не будет играть на EURO-2021. Сочувствую'.format(country))
                         return
+
+        if call.data == 'Португалия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Франция_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Германия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Бельгия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Уэльс_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Дания_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Италия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Австрия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Нидерланды_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Чехия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Хорватия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Испания_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Швейцария_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Англия_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Швеция_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
+
+        if call.data == 'Украина_1':
+            name = call.data.split("_")[0]
+            match = parse()
+            dtt = '{}-{}-{}'.format(date.year, date.month, date.day)
+            datetime = date.strptime(dtt, '%Y-%m-%d')
+            i = 0
+
+            def recursive_function(data):
+
+                new_date = data.strftime("%Y-%m-%d")
+                for m in match:
+                    if m['date'] == new_date:
+                        for team in m['teams']:
+                            if team == name:
+                                number = date.strptime(m['date'], '%Y-%m-%d')
+                                numb = '{}'.format(number.day)
+                                month = number.strftime('%B')
+
+                                dictionary_month = {
+                                    'January': 'Января', 
+                                    'Fabruary': 'Февраля',
+                                    'March': 'Марта',
+                                    'April': 'Апреля',
+                                    'May': 'Мая',
+                                    'June': 'Июня',
+                                    'July': 'Июля', 
+                                    'August': 'Августа',
+                                    'September': 'Сентября',
+                                    'Octember': 'Октября',
+                                    'November': 'Ноября',
+                                    'December': 'Декабря',
+                                }
+
+                                month = dictionary_month[month]
+
+                                bot.send_message(call.message.chat.id, '{} - {}. {}-{}. Игра проходила {} {}'.format(m['teams'][0], m['teams'][1], m['score'][0], m['score'][1], numb, month))
+                                return
+                i = 0
+                i += 1
+                recursive_function(data + timedelta(days = -i))
+
+            recursive_function(datetime)
 
 bot.polling(none_stop = True)
