@@ -31,7 +31,7 @@ declension_of_words = {
     "Украина": "Украиной",    
 }
 
-date = datetime.datetime.today()
+date = datetime.datetime.today() + timedelta(hours = 3)
 
 def num_word(value, words):
     value = value % 100
